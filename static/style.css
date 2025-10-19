@@ -1,0 +1,232 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    height: 100vh;
+    background-color: #f8f9fa; /* Açık gri arkaplan */
+    color: #212529; /* Koyu metin */
+    font-size: 16px; /* Temel font boyutu */
+}
+
+.container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Hafif gölge */
+    background-color: #fff; /* Ana içerik beyaz */
+    overflow: hidden; /* Taşmaları engelle */
+}
+
+/* Sol Menü */
+.sidebar {
+    width: 280px;
+    background-color: #f1f3f5; /* Hafif gri */
+    padding: 20px;
+    border-right: 1px solid #dee2e6;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Gerektiğinde kaydır */
+    flex-shrink: 0; /* Küçülme */
+    transition: width 0.3s ease;
+}
+
+.sidebar h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+    color: #495057;
+    border-bottom: 1px solid #ced4da;
+    padding-bottom: 10px;
+    font-weight: 600;
+}
+
+#new-chat-button {
+    background-color: #0d6efd; /* Mavi */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    font-size: 0.9em;
+    font-weight: 500;
+    text-align: center;
+    transition: background-color 0.2s ease;
+}
+#new-chat-button:hover { background-color: #0b5ed7; }
+#new-chat-button:disabled { background-color: #6c757d; cursor: not-allowed;}
+
+#conversation-list { list-style: none; padding: 0; margin: 0; flex-grow: 1; }
+#conversation-list li { margin-bottom: 8px; }
+#conversation-list li a {
+    text-decoration: none;
+    color: #343a40;
+    display: block;
+    padding: 12px 15px;
+    border-radius: 6px;
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    font-size: 0.85em;
+    line-height: 1.4;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    position: relative;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+#conversation-list li a small {
+    display: block;
+    font-size: 0.8em;
+    color: #6c757d;
+    margin-top: 4px;
+}
+#conversation-list li.active a {
+    background-color: #cfe2ff; /* Açık mavi */
+    border-color: #9ec5fe;
+    font-weight: 600;
+    color: #0a58ca; /* Koyu mavi */
+}
+#conversation-list li a:hover { background-color: #e9ecef; border-color: #ced4da; }
+
+/* Sağ Alan */
+.chat-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: #ffffff;
+}
+
+.chat-area header {
+    background-color: #ffffff;
+    padding: 15px 25px;
+    border-bottom: 1px solid #dee2e6;
+    flex-shrink: 0; /* Başlık küçülmesin */
+}
+.chat-area header h1 { margin: 0; font-size: 1.3em; font-weight: 600; color: #343a40;}
+.chat-area header p { margin: 4px 0 0; font-size: 0.85em; color: #6c757d; }
+
+#chat-box {
+    flex-grow: 1; /* Kalan dikey alanı kapla */
+    overflow-y: auto; /* Mesajlar sığmazsa kaydır */
+    padding: 25px;
+    background-color: #ffffff;
+}
+
+.message {
+    margin-bottom: 18px;
+    padding: 12px 18px;
+    border-radius: 12px;
+    max-width: 75%;
+    word-wrap: break-word; /* Uzun kelimeler için kır */
+    line-height: 1.6;
+    font-size: 0.95em;
+    /* Mesaj animasyonu (opsiyonel) */
+    /* animation: fadeIn 0.3s ease-out; */
+}
+/* @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } } */
+
+.user-message {
+    background-color: #d1e7dd; /* Açık yeşil */
+    color: #0f5132; /* Koyu yeşil */
+    margin-left: auto; /* Sağa yasla */
+    border-bottom-right-radius: 4px;
+}
+.bot-message {
+    background-color: #f8f9fa; /* Çok açık gri */
+    border: 1px solid #e9ecef;
+    color: #343a40; /* Koyu gri */
+    margin-right: auto; /* Sola yasla */
+    border-bottom-left-radius: 4px;
+}
+
+/* Markdown stilleri (Marked.js çıktısı için) */
+.bot-message pre {
+    background-color: #e9ecef; padding: 12px; border-radius: 6px;
+    overflow-x: auto; font-family: "SFMono-Regular", Consolas, Menlo, Courier, monospace;
+    font-size: 0.9em; margin: 10px 0; border: 1px solid #dee2e6;
+    white-space: pre-wrap; /* Uzun kod satırlarını kır */
+    word-wrap: break-word;
+}
+.bot-message code:not(pre code) { /* Inline kod */
+     font-family: "SFMono-Regular", Consolas, Menlo, Courier, monospace;
+     background-color: #e9ecef; padding: 3px 5px; border-radius: 4px;
+     font-size: 0.9em; border: 1px solid #dee2e6;
+}
+.bot-message ul, .bot-message ol { padding-left: 25px; margin: 8px 0; }
+.bot-message li { margin-bottom: 5px; }
+.bot-message strong, .bot-message b { font-weight: 600; }
+.bot-message em, .bot-message i { font-style: italic; }
+.bot-message p { margin: 0 0 0.5rem 0; }
+.bot-message p:last-child { margin-bottom: 0; }
+.bot-message table { border-collapse: collapse; margin: 1rem 0; width: auto; font-size: 0.9em;}
+.bot-message th, .bot-message td { border: 1px solid #dee2e6; padding: 6px 10px; text-align: left;}
+.bot-message th { background-color: #e9ecef; font-weight: 600; }
+.bot-message blockquote {
+    border-left: 3px solid #ced4da;
+    padding-left: 10px;
+    margin-left: 0;
+    color: #6c757d;
+    font-style: italic;
+}
+.bot-message hr { border: none; border-top: 1px solid #dee2e6; margin: 1rem 0; }
+
+
+.input-area {
+    display: flex;
+    align-items: flex-end;
+    padding: 15px 25px;
+    border-top: 1px solid #dee2e6;
+    background-color: #f8f9fa; /* Arkaplan */
+    flex-shrink: 0; /* Küçülmesin */
+}
+
+#message-input {
+    flex-grow: 1; padding: 10px 12px; border: 1px solid #ced4da;
+    border-radius: 6px; margin-right: 10px; resize: none;
+    min-height: 40px; max-height: 150px; overflow-y: auto;
+    box-sizing: border-box; font-size: 0.95em; line-height: 1.5;
+    background-color: #fff; color: #212529;
+}
+#message-input:focus {
+    outline: none; border-color: #86b7fe;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+#send-button {
+    padding: 9px 20px; background-color: #198754; /* Yeşil */
+    color: white; border: none; border-radius: 6px; cursor: pointer;
+    font-size: 0.95em; font-weight: 500; height: 40px;
+    box-sizing: border-box; transition: background-color 0.2s ease;
+}
+#send-button:hover { background-color: #157347; }
+#send-button:disabled { background-color: #6c757d; cursor: not-allowed;}
+
+#loading-indicator p { color: #6c757d; font-style: italic; font-size: 0.9em; }
+
+/* Küçük Ekran Düzenlemeleri */
+@media (max-width: 768px) {
+    body { height: 100%; /* Mobil tam yükseklik */ overflow: hidden; } /* Kaydırmayı engelle */
+    .container { flex-direction: column; height: 100%; }
+    .sidebar {
+        width: 100%; height: auto; max-height: 35vh; /* Yüksekliği sınırla */
+        border-right: none; border-bottom: 1px solid #dee2e6;
+        box-sizing: border-box; padding: 15px;
+    }
+    .sidebar h2 { font-size: 1em; margin-bottom: 10px; }
+    #new-chat-button { margin-bottom: 15px; }
+    #conversation-list li a { padding: 10px; font-size: 0.8em; } /* Daha küçük font */
+    #conversation-list li a small { font-size: 0.75em;}
+
+    .chat-area { height: auto; flex-grow: 1; overflow: hidden; /* İç kaydırmayı #chat-box yapsın */ }
+    .chat-area header { padding: 10px 15px; }
+    .chat-area header h1 { font-size: 1.1em; }
+    .chat-area header p { font-size: 0.8em; }
+
+    #chat-box { padding: 15px; flex-grow: 1; /* Esas kaydırma alanı bu olsun */ }
+    .input-area { padding: 10px 15px; flex-shrink: 0;}
+    .message { max-width: 85%; }
+    #message-input { min-height: 38px; font-size: 0.9em; }
+    #send-button { height: 38px; padding: 8px 15px; font-size: 0.9em;}
+}
