@@ -122,7 +122,7 @@ python app.py
 └── README.md
 
 🌐 Web Arayüzü & Product Kılavuzu
-Canlı Demo Linki: [ Projenizi deploy ettikten sonra canlı linki buraya ekleyin ]
+Canlı Demo Linki: https://monopoly-asistani.onrender.com 
 
 Kullanım:
 
