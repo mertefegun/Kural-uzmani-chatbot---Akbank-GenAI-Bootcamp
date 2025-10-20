@@ -136,9 +136,7 @@ Kullanım:
 
 5- Chatbot, yüklenen PDF dosyasındaki bilgilere dayanarak sorunuza yanıt vermeye çalışacaktır.
 
-(Buraya Ekran Görüntüleri veya Video Ekleyin)
-
-. Chatbot arayüzünün genel görünümü.
+. Chatbot arayüzünün genel görünümü: ![Chatbot Arayüzü](images/arayuz.png)
 
 . Chatbot'un verdiği yanıtları gösterdiğin kısa bir ekran kaydı videosu: " https://youtu.be/BAma-9Hm4To "
 
@@ -147,6 +145,8 @@ Bu proje ile Monopoly oyunu için kapsamlı bir bilgi kaynağını temel alan, R
 
 📚 Yardımcı Kaynaklar
 . [Monopoly Kural Kitapçığı ve Ek Bilgiler (monopoly_kapsamli_veri.pdf)]
+
+. Gemini 
 
 . LangChain Documentation
 
