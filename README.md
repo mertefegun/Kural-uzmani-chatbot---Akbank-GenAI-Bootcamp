@@ -94,15 +94,17 @@ python app.py
 
 . Chatbot arayüzü açılacaktır. Aşağıdaki gibi sorular sorarak test edebilirsiniz:
 
-  . "Başlangıçtan geçerken ne kadar maaş alınır?"
+  . "Bankada ev veya otel kalmazsa ne olur?"
 
   . "Kodes'ten çıkmak için ne kadar ödemem gerekir?"
 
-  . "İpotekli arsama ev kurabilir miyim?"
+  . "İpotekli mülk satılabilir mi?"
 
   . "Açık artırma nasıl yapılır?"
 
   . "Kamu kuruluşlarının kirası nasıl hesaplanır?"
+
+  . "Evleri nasıl kurarım? Sırayla mı kurmak zorundayım?"
 
 📁 Proje Yapısı
 .
