@@ -29,12 +29,11 @@ def extract_text_from_pdf(pdf_path):
         for i, page in enumerate(reader.pages):
             page_text = page.extract_text()
             if page_text:
-                # Metin temizleme (opsiyonel ama faydalı olabilir)
                 page_text = page_text.replace("-\n", "").replace("- \n", "") # Tire ile bölünen kelimeler
                 page_text = ' '.join(page_text.split()) # Çoklu boşlukları tek boşluğa indir
-                full_text += page_text + "\n\n" # Sayfalar arasına çift satır boşluk ekle (paragraf ayırımı için)
+                full_text += page_text + "\n\n" # Sayfalar arasına çift satır boşluk
         print("PDF metin çıkarma işlemi tamamlandı.")
-        return full_text.strip() # Başındaki/sonundaki boşlukları temizle
+        return full_text.strip()
     except Exception as e:
         print(f"Hata: PDF dosyası okunurken veya işlenirken sorun oluştu: {e}", file=sys.stderr)
         traceback.print_exc()
@@ -58,13 +57,18 @@ def create_database():
         print(f"Hata: Google API yapılandırılamadı: {e}", file=sys.stderr)
         sys.exit(1)
 
-    data_path = "data/fb-terraforming-mars-rule.pdf"
+    # <<<--- GÜNCELLENDİ: Okunacak dosya adı ---<<<
+    data_path = "data/monopoly_kapsamli_veri.pdf"
     print(f"Veri dosyası olarak kullanılacak: {data_path}")
 
     if not os.path.exists("data"):
         print("Hata: 'data' klasörü bulunamadı.", file=sys.stderr)
         print(f"Lütfen 'data' klasörünü oluşturun ve '{os.path.basename(data_path)}' dosyasını içine koyun.", file=sys.stderr)
         sys.exit(1)
+    if not os.path.exists(data_path):
+        print(f"Hata: Veri dosyası '{data_path}' bulunamadı.", file=sys.stderr)
+        sys.exit(1)
+
 
     text_content = extract_text_from_pdf(data_path)
     if text_content is None or not text_content.strip():
@@ -81,7 +85,7 @@ def create_database():
     print("Metin parçalayıcı (Text Splitter) oluşturuldu.")
 
     chunks = text_splitter.split_text(text_content)
-    documents = [Document(page_content=chunk) for chunk in chunks if chunk.strip()] # Boş olanları filtrele
+    documents = [Document(page_content=chunk) for chunk in chunks if chunk.strip()]
 
     if not documents:
         print("Hata: Metin parçalara ayrılamadı.", file=sys.stderr)
@@ -99,7 +103,8 @@ def create_database():
         sys.exit(1)
 
     db_path = "./chroma_db"
-    collection_name = "gaih_tmars_rules"
+    # <<<--- GÜNCELLENDİ: Koleksiyon adı ---<<<
+    collection_name = "gaih_monopoly_comprehensive"
     print(f"Vektör veritabanı '{db_path}' klasörüne '{collection_name}' koleksiyonu ile kaydedilecek.")
 
     if os.path.exists(db_path):
@@ -111,7 +116,7 @@ def create_database():
             print(f"Uyarı: '{db_path}' klasörü silinirken hata: {e}", file=sys.stderr)
 
     try:
-        print("Chroma veritabanı oluşturuluyor...")
+        print("Chroma veritabanı oluşturuluyor ve belgeler işleniyor...")
         vectordb = Chroma.from_documents(
             documents=documents,
             embedding=embedding_function,
