@@ -140,7 +140,7 @@ Kullanım:
 
 . Chatbot arayüzünün genel görünümü.
 
-. Örnek bir Monopoly sorusu ve chatbot'un verdiği yanıt.
+. Chatbot'un verdiği yanıtları gösterdiğin kısa bir ekran kaydı videosu: " https://youtu.be/BAma-9Hm4To "
 
 ✨ Sonuçlar ve Değerlendirme
 Bu proje ile Monopoly oyunu için kapsamlı bir bilgi kaynağını temel alan, RAG tabanlı bir "Monopoly Yardımcı Asistanı" chatbot geliştirilmiştir. PDF verisinden metin çıkarma, LangChain ile RAG akışı, ChromaDB vektör veritabanı ve Google Gemini API entegrasyonu başarıyla kullanılmıştır. Veri seti, Gemini kullanılarak potansiyel sorular ve cevaplarla zenginleştirilmiştir. Flask ile sunulan web arayüzü, oyuncuların oyun sırasında sorularına hızlı yanıt almasını sağlar. Proje, Akbank GenAI Bootcamp proje gereksinimlerini karşılamaktadır.
