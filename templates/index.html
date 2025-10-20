@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ page_title|default('Kural Uzmanı Chatbot') }}</title>
+    <title>{{ page_title|default('Monopoly Yardımcı Asistanı') }}</title> {# <-- Başlık Monopoly oldu #}
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.11/dist/purify.min.js"></script>
@@ -17,7 +17,8 @@
                 {% for conv in conversations %}
                     <li class="{{ 'active' if conv.id == current_session_id else '' }}" role="presentation">
                         <a href="{{ url_for('load_conversation', session_id=conv.id) }}" role="menuitem">
-                            {{ conv.title | truncate(35, True) }} <small>{{ conv.created_at }}</small>
+                            {{ conv.title | truncate(35, True) }}
+                            <small>{{ conv.created_at }}</small>
                         </a>
                     </li>
                 {% else %}
@@ -28,33 +29,33 @@
 
         <div class="chat-area">
             <header>
-                <h1>{{ header_title|default('Kural Uzmanı Chatbot') }}</h1>
-                <p>{{ header_subtitle|default('Masaüstü oyunu kuralları hakkında sorularınızı yanıtlar.') }}</p>
+                <h1>{{ header_title|default('Monopoly Yardımcı Asistanı') }}</h1> {# <-- Başlık Monopoly oldu #}
+                <p>{{ header_subtitle|default('Monopoly kuralları ve oyunu hakkında sorularınızı yanıtlar.') }}</p> {# <-- Alt Başlık Monopoly oldu #}
             </header>
             <div id="chat-box" aria-live="polite" aria-atomic="false">
                 {% if not conversation_history %}
                     <div class="message bot-message" role="log" aria-label="Bot mesajı">
-                        <p>Merhaba! Terraforming Mars kuralları hakkında ne öğrenmek istersiniz?</p>
+                        {# <<<--- GÜNCELLENDİ: İlk Karşılama Mesajı ---<<< #}
+                        <p>Merhaba! Monopoly kuralları hakkında ne öğrenmek istersiniz?</p>
                     </div>
                 {% endif %}
                 {% for message in conversation_history %}
                     <div class="message {{ 'user-message' if message.role == 'user' else 'bot-message' }}" role="log" aria-label="{{ 'Kullanıcı' if message.role == 'user' else 'Bot' }} mesajı">
-                        {# Bot mesajlarını Markdown'dan HTML'e çevirerek göster #}
                         {% if message.role == 'bot' %}
-                            {# Flask tarafında render edilen HTML'i güvenli bir şekilde ekle #}
                             {{ renderMarkdown(message.content) | safe }}
                         {% else %}
-                            {# Kullanıcı mesajını güvenli göster #}
                             <p>{{ message.content | escape }}</p>
                         {% endif %}
                     </div>
                 {% endfor %}
                  <div id="loading-indicator" class="message bot-message" style="display: none;" role="status" aria-label="Bot yanıtı hazırlanıyor">
-                    <p><i>Kural kitapçığına bakıyorum...</i></p>
+                     {# <<<--- GÜNCELLENDİ: Yükleme Mesajı ---<<< #}
+                    <p><i>Monopoly bilgileri aranıyor...</i></p>
                 </div>
             </div>
             <div class="input-area" role="form" aria-label="Mesaj gönderme alanı">
-                <textarea id="message-input" placeholder="Terraforming Mars kural sorunuzu buraya yazın..." rows="1" aria-label="Kural sorunuzu yazın"></textarea>
+                 {# <<<--- GÜNCELLENDİ: Placeholder ---<<< #}
+                <textarea id="message-input" placeholder="Monopoly sorunuzu buraya yazın..." rows="1" aria-label="Monopoly sorunuzu yazın"></textarea>
                 <button id="send-button" aria-label="Mesajı gönder">Gönder</button>
             </div>
         </div>
@@ -71,180 +72,135 @@
         const currentSessionId = "{{ current_session_id }}";
 
         // Marked.js ayarları
-        marked.setOptions({
-          breaks: true, // Satır başlarını <br> yap
-          gfm: true     // GitHub Flavored Markdown'ı etkinleştir (tablolar, üstü çizili vb.)
-        });
+        marked.setOptions({ breaks: true, gfm: true });
 
-        // Sayfa yüklenince çalışacaklar
         window.onload = () => {
-             scrollToBottom(); // Sohbeti en alta kaydır
-             adjustTextareaHeight(); // Textarea boyutunu ayarla
-             messageInput.focus(); // Mesaj alanına odaklan
+             scrollToBottom();
+             adjustTextareaHeight();
+             messageInput.focus();
         };
 
-        // Sohbeti en alta kaydır
         function scrollToBottom() {
-            // Render işleminin tamamlanması için küçük bir gecikme
             setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 50);
         }
 
-        // Ana mesaj gönderme fonksiyonu
         async function sendMessage() {
             const message = messageInput.value.trim();
-            if (!message || sendButton.disabled) return; // Boş mesaj veya buton pasifse gönderme
+            if (!message || sendButton.disabled) return;
 
-            sendButton.disabled = true; // Tekrarlı gönderimi önle
-            sendButton.textContent = "..."; // Buton metnini değiştir
+            sendButton.disabled = true;
+            sendButton.textContent = "...";
 
-            appendMessage(message, 'user'); // Kullanıcı mesajını ekle
-            messageInput.value = ''; // Input'u temizle
-            adjustTextareaHeight(); // Textarea boyutunu ayarla
-            loadingIndicator.style.display = 'block'; // Yükleniyor... göster
+            appendMessage(message, 'user');
+            messageInput.value = '';
+            adjustTextareaHeight();
+            loadingIndicator.style.display = 'block';
             scrollToBottom();
 
             try {
-                // Sunucuya POST isteği gönder
                 const response = await fetch('/send_message', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ message: message }),
                 });
 
-                // Yanıtı JSON olarak al
                 const data = await response.json();
-
-                // HTTP durum kodu başarısızsa (4xx, 5xx)
-                if (!response.ok) {
-                    // Sunucudan gelen hata mesajını kullan, yoksa genel hata
-                    throw new Error(data.response || `Sunucu hatası (${response.status})`);
-                }
-
-                // Bot yanıtını ekle (JS tarafında render edilecek)
+                if (!response.ok) { throw new Error(data.response || `Sunucu hatası (${response.status})`); }
                 appendMessage(data.response, 'bot');
-                // Sol menüyü güncelle
                 updateConversationList(data.conversations);
 
             } catch (error) {
                 console.error('Mesaj gönderme hatası:', error);
-                // Hata mesajını ekle (render etmeden)
                 appendMessage(`Hata: ${error.message}`, 'bot', false);
             } finally {
-                 // Her durumda yapılacaklar
-                 loadingIndicator.style.display = 'none'; // Yükleniyor... gizle
-                 sendButton.disabled = false; // Butonu tekrar aktif et
-                 sendButton.textContent = "Gönder"; // Buton metnini eski haline getir
-                 scrollToBottom(); // Tekrar en alta kaydır
-                 messageInput.focus(); // Tekrar mesaj alanına odaklan
+                 loadingIndicator.style.display = 'none';
+                 sendButton.disabled = false;
+                 sendButton.textContent = "Gönder";
+                 scrollToBottom();
+                 messageInput.focus();
             }
         }
 
-        // Mesajı sohbet kutusuna DOM olarak ekler
         function appendMessage(content, role, renderMd = (role === 'bot')) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message', role === 'user' ? 'user-message' : 'bot-message');
-            messageDiv.setAttribute('role', 'log'); // Erişilebilirlik
+            messageDiv.setAttribute('role', 'log');
             messageDiv.setAttribute('aria-label', `${role === 'user' ? 'Kullanıcı' : 'Bot'} mesajı`);
 
             if (renderMd) {
-                // Marked.js ile çevir
                 const rawHtml = marked.parse(content || "");
-                // DOMPurify ile güvenli hale getir (XSS önlemi)
-                const cleanHtml = DOMPurify.sanitize(rawHtml, {
-                    USE_PROFILES: { html: true } // Güvenli HTML etiketlerine izin ver
-                });
+                const cleanHtml = DOMPurify.sanitize(rawHtml, { USE_PROFILES: { html: true } });
                 messageDiv.innerHTML = cleanHtml;
             } else {
-                // Düz metin (kullanıcı mesajı veya hata)
                 const p = document.createElement('p');
-                p.textContent = content; // Güvenli yol
+                p.textContent = content;
                 messageDiv.appendChild(p);
             }
-             // Yükleniyor göstergesinin hemen öncesine ekle
              chatBox.insertBefore(messageDiv, loadingIndicator);
-             scrollToBottom(); // Ekleme sonrası kaydır
+             scrollToBottom();
         }
 
-        // Sol menüdeki sohbet listesini günceller
         function updateConversationList(conversationsData) {
-            conversationList.innerHTML = ''; // Önce temizle
+            conversationList.innerHTML = '';
              if (!conversationsData || conversationsData.length === 0) {
                  conversationList.innerHTML = '<li role="presentation"><small>Henüz sohbet yok.</small></li>';
                  return;
              }
-            // Sunucudan gelen listeyi (ters sıralı) işle
             conversationsData.forEach(conv => {
                 const li = document.createElement('li');
                 li.setAttribute('role', 'presentation');
                 if (conv.id === currentSessionId) { li.classList.add('active'); }
-
                 const a = document.createElement('a');
                 a.href = `/conversation/${conv.id}`;
                 a.setAttribute('role', 'menuitem');
-
-                // Başlığı kısalt (max 35 karakter)
                 const title = conv.title.length > 35 ? conv.title.substring(0, 32) + '...' : conv.title;
-
-                // Güvenli şekilde başlık ve tarihi ekle
                 const titleNode = document.createTextNode(title);
                 const smallNode = document.createElement('small');
                 smallNode.textContent = conv.created_at;
-
                 a.appendChild(titleNode);
-                a.appendChild(document.createElement('br')); // Tarihi alta al
+                a.appendChild(document.createElement('br'));
                 a.appendChild(smallNode);
                 li.appendChild(a);
                 conversationList.appendChild(li);
             });
         }
 
-        // Yeni sohbet başlatma isteği gönderir
         async function startNewChat() {
-            newChatButton.disabled = true; // Butonu pasif yap
+            newChatButton.disabled = true;
             newChatButton.textContent = "Başlatılıyor...";
             try {
                 const response = await fetch('/new_chat', { method: 'POST' });
                 const data = await response.json();
                 if (data.success && data.new_session_id) {
-                    // Başarılıysa sayfayı yeni sohbet URL'sine yönlendir
                     window.location.href = `/conversation/${data.new_session_id}`;
-                    // Yönlendirme olacağı için butonu tekrar aktif etmeye gerek yok
                 } else {
                      console.error("Yeni sohbet başlatılamadı:", data);
                      alert("Yeni sohbet başlatılırken bir sunucu hatası oluştu.");
-                     newChatButton.disabled = false; // Hata durumunda aktif et
+                     newChatButton.disabled = false;
                      newChatButton.textContent = "+ Yeni Sohbet Başlat";
                 }
             } catch (error) {
                 console.error('Yeni sohbet ağ hatası:', error);
                  alert("Yeni sohbet başlatılırken bir bağlantı hatası oluştu: " + error.message);
-                 newChatButton.disabled = false; // Hata durumunda aktif et
+                 newChatButton.disabled = false;
                  newChatButton.textContent = "+ Yeni Sohbet Başlat";
             }
         }
 
-        // Textarea'nın yüksekliğini içeriğine göre ayarlar
         function adjustTextareaHeight() {
-            messageInput.style.height = 'auto'; // Hesaplama için sıfırla
+            messageInput.style.height = 'auto';
             const scrollHeight = messageInput.scrollHeight;
-            const maxHeight = 150; // Maksimum yükseklik (px)
-            // Yeni yüksekliği ayarla (padding vs dahil, border-box varsayımı)
+            const maxHeight = 150;
             messageInput.style.height = Math.min(scrollHeight, maxHeight) + 'px';
         }
 
         // Olay Dinleyicileri
         sendButton.addEventListener('click', sendMessage);
         messageInput.addEventListener('keypress', (e) => {
-            // Sadece Enter -> Gönder
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault(); sendMessage();
-            }
-            // Shift+Enter -> Yeni satır (yüksekliği ayarla)
-            if (e.key === 'Enter' && e.shiftKey) {
-                 setTimeout(adjustTextareaHeight, 0);
-            }
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+            if (e.key === 'Enter' && e.shiftKey) { setTimeout(adjustTextareaHeight, 0); }
         });
-        messageInput.addEventListener('input', adjustTextareaHeight); // Yazarken ayarla
+        messageInput.addEventListener('input', adjustTextareaHeight);
         newChatButton.addEventListener('click', startNewChat);
 
     </script>
